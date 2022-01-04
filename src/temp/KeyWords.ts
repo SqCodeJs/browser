@@ -1,0 +1,28 @@
+import { Keyword } from "../types/types";
+const keyWords: Keyword[] = [
+  { keyword: "Kraków", category: "location" },
+  { keyword: "Krakówww", category: "location" },
+  { keyword: "Krakówwww", category: "location" },
+  { keyword: "Krakówwwwwww", category: "location" },
+  { keyword: "Poznań", category: "location" },
+  { keyword: "Warszawa", category: "location" },
+  { keyword: "Katowice", category: "location" },
+  { keyword: "Wrocław", category: "location" },
+  { keyword: "Lódz", category: "location" },
+  { keyword: "Szczecin", category: "location" },
+  { keyword: "Gdańsk", category: "location" },
+  { keyword: "Bydgoszcz", category: "location" },
+  { keyword: "Toruń", category: "location" },
+  { keyword: "JavaScript", category: "skill" },
+  { keyword: "Typescript", category: "skill" },
+  { keyword: "Python", category: "skill" },
+  { keyword: "Java", category: "skill" },
+  { keyword: "Go", category: "skill" },
+  { keyword: "PHP", category: "skill" },
+  { keyword: "js", category: "tag" },
+  { keyword: "react", category: "tag" },
+  { keyword: "ts", category: "tag" },
+  { keyword: "express", category: "tag" },
+  { keyword: "laravel", category: "tag" },
+];
+export { keyWords };

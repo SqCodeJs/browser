@@ -4,28 +4,34 @@ import BrowserButton from "./BrowserButton";
 import styled from "styled-components";
 import { Keyword } from "./../types/types";
 import { device } from "./../utils/device";
-const BrowserWrapper = styled.div`
+import { keyWords } from "../temp/KeyWords";
+interface BrowserWrapperProps {
+  autocomplete: number;
+}
+const BrowserWrapper = styled.div<BrowserWrapperProps>`
   width: 80%;
   position: relative;
   display: flex;
   flex-direction: column;
-
-  border: 1px solid rgb(218, 223, 225);
 `;
 interface InputContenierProps {
   active: boolean;
+  autocomplete: number;
 }
 const InputContenier = styled.div<InputContenierProps>`
   width: 100%;
+  padding: 1%;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
-
+  border: 1px solid rgb(218, 223, 225);
+  border-radius: ${(props) =>
+    props.autocomplete > 0 ? "20px 20px 0px 0px" : "none"};
   background-color: ${(props) =>
     props.active ? "rgb(255,255,255)" : "rgb(218, 223, 225)"};
   &:hover {
     background-color: ${(props) =>
-      props.active ? "rgb(255,255,255)" : "rgb(236, 236, 236)"};
+      props.active ? "rgb(255,255,255)" : "rgb(202, 202, 202)"};
   }
 `;
 const Input = styled.input`
@@ -38,86 +44,93 @@ const Input = styled.input`
   &:focus {
     outline: none;
   }
-  font-size: 10px;
+  font-size: 12px;
 
   @media ${device.mobileL} {
-    font-size: 12px;
-  }
-  @media ${device.tablet} {
     font-size: 14px;
   }
-  @media ${device.laptop} {
+  @media ${device.tablet} {
     font-size: 16px;
   }
-  @media ${device.laptopL} {
+  @media ${device.laptop} {
     font-size: 18px;
+  }
+  @media ${device.laptopL} {
+    font-size: 20px;
   }
 `;
 const AutocompleteWrapper = styled.div`
   width: 100%;
   display: flex;
 `;
-const KeyWordsConteriner = styled.div`
-  border: 1px solid green;
-`;
+
 interface BrowserProps {
-  setAutocompleteKeywords: React.Dispatch<React.SetStateAction<Keyword[]>>;
-  autocompleteKeywords: Keyword[];
+  filters: Keyword[];
+  setFilters: React.Dispatch<React.SetStateAction<Keyword[]>>;
 }
-const keyWords: Keyword[] = [
-  { keyword: "Kraków", category: "location" },
-  { keyword: "Poznań", category: "location" },
-  { keyword: "Warszawa", category: "location" },
-  { keyword: "Katowice", category: "location" },
-  { keyword: "Wrocław", category: "location" },
-  { keyword: "Lódz", category: "location" },
-  { keyword: "Szczecin", category: "location" },
-  { keyword: "Gdańsk", category: "location" },
-  { keyword: "Bydgoszcz", category: "location" },
-  { keyword: "Toruń", category: "location" },
-  { keyword: "JavaScript", category: "skill" },
-  { keyword: "Typescript", category: "skill" },
-  { keyword: "Python", category: "skill" },
-  { keyword: "Java", category: "skill" },
-  { keyword: "Go", category: "skill" },
-  { keyword: "PHP", category: "skill" },
-  { keyword: "js", category: "tag" },
-  { keyword: "react", category: "tag" },
-  { keyword: "ts", category: "tag" },
-  { keyword: "express", category: "tag" },
-  { keyword: "laravel", category: "tag" },
-];
-const Browser: React.FC<BrowserProps> = ({
-  setAutocompleteKeywords,
-  autocompleteKeywords,
-}) => {
+
+const Browser: React.FC<BrowserProps> = ({ filters, setFilters }) => {
   const [input, setInput] = useState<string>("");
-  const [filters, setFilters] = useState<string[]>([]);
+  const [autocompleteKeywords, setAutocompleteKeywords] = useState<Keyword[]>(
+    []
+  );
   const [isActive, setIsActive] = useState<boolean>(false);
+  const [cursor, setCursor] = useState<number>(0);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target;
     setInput(newValue.value);
-    if (newValue.value.length >= 2) {
-      const finalKey: Keyword[] = JSON.parse(JSON.stringify(keyWords)).filter(
-        (elem: Keyword) =>
-          elem.keyword.toLowerCase().startsWith(input.toLowerCase())
-      );
-      setAutocompleteKeywords(finalKey);
+
+    const finalKey: Keyword[] = JSON.parse(JSON.stringify(keyWords)).filter(
+      (elem: Keyword) =>
+        elem.keyword.toLowerCase().startsWith(newValue.value.toLowerCase())
+    );
+    if (newValue.value.length < 2) {
+      setAutocompleteKeywords([]);
+    } else if (newValue.value.length >= 2) setAutocompleteKeywords(finalKey);
+  };
+  const handleArrowDown = () => {
+    if (cursor === autocompleteKeywords.length - 1) {
+      setCursor(0);
+    } else setCursor((prev) => prev + 1);
+  };
+  const handleArrowUp = () => {
+    if (cursor === 0) {
+      setCursor(autocompleteKeywords.length - 1);
+    } else {
+      setCursor((prev) => prev - 1);
     }
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (input.length > 15) {
       setInput("");
-      alert("za dlugi ciag znakow");
+      alert("string is to long ");
       return;
     }
+
     if (e.key === "Enter") {
-      console.log("nacisnito enter");
-      const newFitlers = [...filters];
-      newFitlers.push(input);
-      setFilters(newFitlers);
+      if (
+        autocompleteKeywords.length > 0 &&
+        !filters.some((e) => e.keyword === autocompleteKeywords[cursor].keyword)
+      ) {
+        setFilters((prev) => prev.concat(autocompleteKeywords[cursor]));
+      } else if (autocompleteKeywords.length === 0) {
+        if (!filters.some((e) => e.keyword === input)) {
+          setFilters((prev) =>
+            prev.concat({ category: "tag", keyword: input })
+          );
+        }
+      }
 
       setInput("");
+      setCursor(0);
+      setAutocompleteKeywords([]);
+    }
+    if (e.key === "ArrowDown") {
+      handleArrowDown();
+    }
+    if (e.key === "ArrowUp") {
+      handleArrowUp();
     }
   };
   const renderKeyWords = () => {
@@ -130,8 +143,11 @@ const Browser: React.FC<BrowserProps> = ({
     ));
   };
   return (
-    <BrowserWrapper>
-      <InputContenier active={isActive}>
+    <BrowserWrapper autocomplete={autocompleteKeywords.length}>
+      <InputContenier
+        active={isActive}
+        autocomplete={autocompleteKeywords.length}
+      >
         {renderKeyWords()}
         <Input
           type="text"
@@ -139,15 +155,18 @@ const Browser: React.FC<BrowserProps> = ({
           placeholder="location, skill, tag"
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          onBlur={() => setIsActive(false)}
           onFocus={() => setIsActive(true)}
         />
       </InputContenier>
       <AutocompleteWrapper>
         <Autocomplete
           input={input}
-          isActive={isActive}
+          setInput={setInput}
+          cursor={cursor}
+          setCursor={setCursor}
           autocompleteKeywords={autocompleteKeywords}
+          filters={filters}
+          setFilters={setFilters}
         />
       </AutocompleteWrapper>
     </BrowserWrapper>

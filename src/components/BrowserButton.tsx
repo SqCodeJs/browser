@@ -6,7 +6,7 @@ import { device } from "./../utils/device";
 const Wrapp = styled.div`
   flex-grow: 1;
   min-width: 20%;
-  margin: 1%;
+  margin: 2px;
   padding: 0 1%;
   display: flex;
   justify-content: flex-start;
@@ -44,7 +44,7 @@ const KeyWordStyled = styled.div`
 `;
 const CategoryStyled = styled.div`
   background-color: rgb(238, 238, 238);
-  margin: 2%;
+  margin: 2% 1%;
   padding: 1% 3%;
   border-radius: 20px;
   text-transform: uppercase;
@@ -93,16 +93,16 @@ const RemoveButtonStyled = styled.button`
   }
 `;
 interface ButtonProps {
-  //   element: Keyword;
-  element: string;
+  element: Keyword;
+
   remove: () => void;
 }
 
 const BrowserButton: React.FC<ButtonProps> = ({ element, remove }) => {
   return (
     <Wrapp>
-      <CategoryStyled>location</CategoryStyled>
-      <KeyWordStyled>{element}</KeyWordStyled>
+      <CategoryStyled>{element.category}</CategoryStyled>
+      <KeyWordStyled>{element.keyword}</KeyWordStyled>
       <RemoveButtonWrapp>
         <RemoveButtonStyled onClick={remove}>x</RemoveButtonStyled>
       </RemoveButtonWrapp>
