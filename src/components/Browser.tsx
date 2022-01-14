@@ -5,6 +5,13 @@ import styled from "styled-components";
 import { Keyword } from "./../types/types";
 import { device } from "./../utils/device";
 import { keyWords } from "../temp/KeyWords";
+import { useDispatch } from "react-redux";
+
+import {
+  AddFilter,
+  RemoveFilter,
+  ClearFilters,
+} from "../state/action/filtersActions";
 interface BrowserWrapperProps {
   autocomplete: number;
 }
@@ -76,6 +83,7 @@ const Browser: React.FC<BrowserProps> = ({ filters, setFilters }) => {
   );
   const [isActive, setIsActive] = useState<boolean>(false);
   const [cursor, setCursor] = useState<number>(0);
+  const dispatch = useDispatch();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target;
@@ -114,11 +122,12 @@ const Browser: React.FC<BrowserProps> = ({ filters, setFilters }) => {
         !filters.some((e) => e.keyword === autocompleteKeywords[cursor].keyword)
       ) {
         setFilters((prev) => prev.concat(autocompleteKeywords[cursor]));
+        dispatch(AddFilter(autocompleteKeywords[cursor]));
       } else if (autocompleteKeywords.length === 0) {
         if (!filters.some((e) => e.keyword === input)) {
-          setFilters((prev) =>
-            prev.concat({ category: "tag", keyword: input })
-          );
+          const filter: Keyword = { keyword: input, category: "tag" };
+          setFilters((prev) => prev.concat(filter));
+          dispatch(AddFilter(filter));
         }
       }
 
@@ -133,22 +142,25 @@ const Browser: React.FC<BrowserProps> = ({ filters, setFilters }) => {
       handleArrowUp();
     }
   };
-  const renderKeyWords = () => {
-    return filters.map((keyWord, i) => (
-      <BrowserButton
-        key={i}
-        element={keyWord}
-        remove={() => setFilters(filters.filter((e) => e !== keyWord))}
-      />
-    ));
-  };
+
+  const renderKeyWords = filters.map((keyWord, i) => (
+    <BrowserButton
+      key={i}
+      element={keyWord}
+      remove={() => {
+        dispatch(RemoveFilter(keyWord));
+        setFilters(filters.filter((e) => e !== keyWord));
+      }}
+    />
+  ));
+
   return (
     <BrowserWrapper autocomplete={autocompleteKeywords.length}>
       <InputContenier
         active={isActive}
         autocomplete={autocompleteKeywords.length}
       >
-        {renderKeyWords()}
+        {renderKeyWords}
         <Input
           type="text"
           value={input}

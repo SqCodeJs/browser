@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import styled, { createGlobalStyle } from "styled-components";
 import { Keyword } from "./../types/types";
 import Browser from "./Browser";
@@ -23,6 +24,8 @@ const Wrapper = styled.div`
 function App() {
   const [filters, setFilters] = useState<Keyword[]>([]);
   //seach offers, articles etc by state - filters
+  const state = useSelector((state) => state);
+  console.log("STATE", state);
   return (
     <Wrapper>
       <GlobalStyle />

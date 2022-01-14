@@ -2,6 +2,12 @@ import React from "react";
 import { Keyword } from "../types/types";
 import styled from "styled-components";
 import { device } from "../utils/device";
+import { useDispatch } from "react-redux";
+import {
+  AddFilter,
+  RemoveFilter,
+  ClearFilters,
+} from "../state/action/filtersActions";
 interface WrappProps {
   autocompleteKeywords: number;
 }
@@ -107,6 +113,7 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
   filters,
   setFilters,
 }) => {
+  const dispatch = useDispatch();
   return (
     <Wrapp autocompleteKeywords={autocompleteKeywords.length}>
       <ListStyled>
@@ -123,6 +130,7 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
                     )
                   ) {
                     setFilters((prev) => prev.concat(element));
+                    dispatch(AddFilter(element));
                     setCursor(0);
                     setInput("");
                   } else setInput("");

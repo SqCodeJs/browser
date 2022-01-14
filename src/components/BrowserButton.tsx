@@ -1,8 +1,13 @@
 import React from "react";
+import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import { Keyword } from "../types/types";
 import { device } from "./../utils/device";
-
+import {
+  AddFilter,
+  RemoveFilter,
+  ClearFilters,
+} from "../state/action/filtersActions";
 const Wrapp = styled.div`
   flex-grow: 1;
   min-width: 20%;
